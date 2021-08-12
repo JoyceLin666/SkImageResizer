@@ -17,6 +17,7 @@ namespace SkImageResizer
             var destinationPath1 = Path.Combine(Environment.CurrentDirectory, "output1");
             var destinationPath2 = Path.Combine(Environment.CurrentDirectory, "output2");
             var destinationPath3 = Path.Combine(Environment.CurrentDirectory, "output3");
+            var destinationPath4 = Path.Combine(Environment.CurrentDirectory, "output3");
 
             // Sync
 
@@ -74,8 +75,56 @@ namespace SkImageResizer
 
             sw.Stop();
 
+            // Async
+
+            imageProcess.Clean(destinationPath3);
+
+            sw.Restart();
+
+            try
+            {
+                await imageProcess.ResizeImagesAsync2(sourcePath, destinationPath3, 2.0);
+            }
+            catch (OperationCanceledException ex)
+            {
+                Console.WriteLine($"Canceled: {ex}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception:{ex}");
+            }
+
+            sw.Stop();
+
             decimal result3 = sw.ElapsedMilliseconds;
             Console.WriteLine($"非同步的花費時間: {result3} ms");
+
+
+
+            // Async
+
+            imageProcess.Clean(destinationPath4);
+
+            sw.Restart();
+
+            try
+            {
+                await imageProcess.ResizeImagesAsync3(sourcePath, destinationPath3, 2.0);
+            }
+            catch (OperationCanceledException ex)
+            {
+                Console.WriteLine($"Canceled: {ex}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception:{ex}");
+            }
+
+            sw.Stop();
+
+            decimal result4 = sw.ElapsedMilliseconds;
+            Console.WriteLine($"非同步的花費時間: {result4} ms");
+
             // Result
             // 效能提升比例公式：((Orig - New) / Orig) * 100%
 
@@ -84,6 +133,9 @@ namespace SkImageResizer
 
             var resultA = ((result1 - result3) / result1) * 100;
             Console.WriteLine($"效能提升 {resultA:f2}%");
+
+            var resultB = ((result1 - result4) / result1) * 100;
+            Console.WriteLine($"效能提升 {resultB:f2}%");
         }
     }
 }
